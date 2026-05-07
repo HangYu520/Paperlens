@@ -5,3 +5,8 @@ PaperLens.app/
 *.icns
 icon.iconset/
 .omx/
+docs/
+setup-xcode.sh
+generate-icon.py
+Package.swift
+Sources/Info.plist
