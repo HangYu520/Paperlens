@@ -20,14 +20,14 @@
 
 ## 安装 / Installation
 
-### 方式 1：下载即用（推荐）
+### 方式 1：下载 .app（推荐）
 
-下载 `PaperLens.app`，拖入 `/Applications`，双击运行。
+从 [Releases](https://github.com/HangYu520/PaperLens/releases) 下载最新 `PaperLens-v1.0.zip`，解压后拖入 `/Applications`，双击运行。
 
 ### 方式 2：从源码编译
 
 ```bash
-git clone https://github.com/your-username/PaperLens.git
+git clone https://github.com/HangYu520/PaperLens.git
 cd PaperLens
 bash build.sh
 open PaperLens.app
