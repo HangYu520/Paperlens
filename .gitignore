@@ -1,0 +1,7 @@
+.build/
+PaperLens.app/
+*.log
+.DS_Store
+*.icns
+icon.iconset/
+.omx/
