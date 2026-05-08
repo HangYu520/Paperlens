@@ -153,30 +153,29 @@ final class AppState: ObservableObject {
         currentTranslationText = text
         dismissButton()
         currentBubbleAnchor = point
-        showBubble(state: .loading, near: point)
+        showBubble(state: .streaming(""), near: point)
 
         let apiKey = KeychainManager.load() ?? ""
         let model = UserDefaults.standard.string(forKey: "deepseekModel") ?? "deepseek-chat"
 
-        Task { [weak self] in
-            guard let self = self else { return }
-            do {
-                let result = try await self.translator.translate(text, apiKey: apiKey, model: model)
-                await MainActor.run {
-                    self.currentTranslationText = text
-                    self.updateBubble(state: .result(result))
-                }
-            } catch let error as TranslationError {
-                await MainActor.run {
-                    self.currentTranslationText = text
-                    self.updateBubble(state: .error(error.localizedDescription))
-                }
-            } catch {
-                await MainActor.run {
-                    self.updateBubble(state: .error(error.localizedDescription))
+        var accumulated = ""
+        translator.translateStream(
+            text,
+            apiKey: apiKey,
+            model: model,
+            onToken: { [weak self] delta in
+                accumulated += delta
+                self?.updateBubble(state: .streaming(accumulated))
+            },
+            onComplete: { [weak self] result in
+                switch result {
+                case .success(let final):
+                    self?.updateBubble(state: .result(final))
+                case .failure(let error):
+                    self?.updateBubble(state: .error(error.localizedDescription))
                 }
             }
-        }
+        )
     }
 
     private func dismissButton() {
@@ -246,25 +245,7 @@ final class AppState: ObservableObject {
             },
             onRetry: { [weak self] in
                 guard let self = self, let text = self.currentTranslationText else { return }
-                self.updateBubble(state: .loading)
-                Task {
-                    let apiKey = KeychainManager.load() ?? ""
-                    let model = UserDefaults.standard.string(forKey: "deepseekModel") ?? "deepseek-chat"
-                    do {
-                        let result = try await self.translator.translate(text, apiKey: apiKey, model: model)
-                        await MainActor.run {
-                            self.updateBubble(state: .result(result))
-                        }
-                    } catch let error as TranslationError {
-                        await MainActor.run {
-                            self.updateBubble(state: .error(error.localizedDescription))
-                        }
-                    } catch {
-                        await MainActor.run {
-                            self.updateBubble(state: .error(error.localizedDescription))
-                        }
-                    }
-                }
+                self.translate(text, near: self.currentBubbleAnchor)
             }
         )
     }

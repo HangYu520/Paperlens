@@ -171,21 +171,21 @@ struct SettingsView: View {
 
         testStatus = .testing
 
-        Task {
-            do {
-                let _ = try await TranslatorService.shared.translate("Hello", apiKey: key, model: model)
-                await MainActor.run {
-                    testStatus = .success
-                }
-            } catch let error as TranslationError {
-                await MainActor.run {
-                    testStatus = .failed(error.localizedDescription)
-                }
-            } catch {
-                await MainActor.run {
-                    testStatus = .failed(error.localizedDescription)
+        TranslatorService.shared.translateStream(
+            "Hello",
+            apiKey: key,
+            model: model,
+            onToken: { _ in },
+            onComplete: { result in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success:
+                        testStatus = .success
+                    case .failure(let error):
+                        testStatus = .failed(error.localizedDescription)
+                    }
                 }
             }
-        }
+        )
     }
 }

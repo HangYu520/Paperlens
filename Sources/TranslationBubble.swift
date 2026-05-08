@@ -3,6 +3,7 @@ import AppKit
 
 enum BubbleState: Equatable {
     case loading
+    case streaming(String)
     case result(String)
     case error(String)
 }
@@ -18,6 +19,8 @@ struct TranslationBubbleView: View {
             switch state {
             case .loading:
                 loadingContent
+            case .streaming(let text):
+                streamingContent(text: text)
             case .result(let text):
                 resultContent(text: text)
             case .error(let message):
@@ -46,6 +49,38 @@ struct TranslationBubbleView: View {
             .foregroundColor(.secondary)
         }
         .frame(maxWidth: .infinity)
+    }
+
+    private func streamingContent(text: String) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ScrollView {
+                HStack(alignment: .top, spacing: 0) {
+                    Text(text)
+                        .font(.system(size: 14))
+                        .lineSpacing(4)
+                        .textSelection(.enabled)
+                    Rectangle()
+                        .fill(Color.primary)
+                        .frame(width: 1.5, height: 16)
+                        .opacity(0.7)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .frame(maxHeight: 260)
+
+            HStack {
+                Spacer()
+                Button {
+                    onDismiss?()
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 14))
+                }
+                .buttonStyle(.plain)
+                .foregroundColor(.secondary)
+            }
+            .padding(.top, 8)
+        }
     }
 
     private func resultContent(text: String) -> some View {
