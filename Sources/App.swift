@@ -195,7 +195,7 @@ final class AppState: ObservableObject {
         let view = makeBubbleView(state: state)
 
         let hostingView = NSHostingView(rootView: view)
-        hostingView.frame.size = NSSize(width: 420, height: 120)
+        hostingView.frame.size = NSSize(width: 520, height: 320)
         hostingView.autoresizingMask = [.width, .height]
 
         let window = makeFloatingWindow(contentView: hostingView, at: bubblePosition, size: hostingView.frame.size, resizable: true)
@@ -286,7 +286,7 @@ final class AppState: ObservableObject {
         panel.contentView = contentView
         panel.hidesOnDeactivate = false
         if resizable {
-            panel.minSize = NSSize(width: 280, height: 100)
+            panel.minSize = NSSize(width: 320, height: 160)
         }
         return panel
     }
