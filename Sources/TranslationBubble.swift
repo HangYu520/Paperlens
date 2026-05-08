@@ -28,7 +28,6 @@ struct TranslationBubbleView: View {
             }
         }
         .padding(16)
-        .frame(maxWidth: 420, maxHeight: 300)
         .background(.regularMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .shadow(color: .black.opacity(0.15), radius: 12, y: 4)
@@ -66,7 +65,6 @@ struct TranslationBubbleView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .frame(maxHeight: 260)
 
             HStack {
                 Spacer()
@@ -92,7 +90,6 @@ struct TranslationBubbleView: View {
                     .textSelection(.enabled)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .frame(maxHeight: 260)
 
             HStack {
                 Spacer()

@@ -196,8 +196,9 @@ final class AppState: ObservableObject {
 
         let hostingView = NSHostingView(rootView: view)
         hostingView.frame.size = NSSize(width: 420, height: 120)
+        hostingView.autoresizingMask = [.width, .height]
 
-        let window = makeFloatingWindow(contentView: hostingView, at: bubblePosition, size: hostingView.frame.size)
+        let window = makeFloatingWindow(contentView: hostingView, at: bubblePosition, size: hostingView.frame.size, resizable: true)
         window.initialFirstResponder = nil
         bubbleWindow = window
         window.orderFront(nil)
@@ -266,10 +267,13 @@ final class AppState: ObservableObject {
 
     // MARK: - Window Factory
 
-    private func makeFloatingWindow(contentView: NSView, at point: NSPoint, size: NSSize) -> NSPanel {
+    private func makeFloatingWindow(contentView: NSView, at point: NSPoint, size: NSSize, resizable: Bool = false) -> NSPanel {
+        var styleMask: NSWindow.StyleMask = [.borderless, .nonactivatingPanel]
+        if resizable { styleMask.insert(.resizable) }
+
         let panel = NSPanel(
             contentRect: NSRect(origin: point, size: size),
-            styleMask: [.borderless, .nonactivatingPanel],
+            styleMask: styleMask,
             backing: .buffered,
             defer: false
         )
@@ -281,6 +285,9 @@ final class AppState: ObservableObject {
         panel.isReleasedWhenClosed = false
         panel.contentView = contentView
         panel.hidesOnDeactivate = false
+        if resizable {
+            panel.minSize = NSSize(width: 280, height: 100)
+        }
         return panel
     }
 
