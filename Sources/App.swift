@@ -199,6 +199,7 @@ final class AppState: ObservableObject {
         hostingView.autoresizingMask = [.width, .height]
 
         let window = makeFloatingWindow(contentView: hostingView, at: bubblePosition, size: hostingView.frame.size, resizable: true)
+        window.setContentSize(NSSize(width: 520, height: 320))
         window.initialFirstResponder = nil
         bubbleWindow = window
         window.orderFront(nil)
