@@ -52,18 +52,29 @@ struct TranslationBubbleView: View {
 
     private func streamingContent(text: String) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            ScrollView {
-                HStack(alignment: .top, spacing: 0) {
-                    Text(text)
-                        .font(.system(size: 14))
-                        .lineSpacing(4)
-                        .textSelection(.enabled)
-                    Rectangle()
-                        .fill(Color.primary)
-                        .frame(width: 1.5, height: 16)
-                        .opacity(0.7)
+            if text.isEmpty {
+                VStack(spacing: 12) {
+                    ProgressView()
+                        .scaleEffect(0.8)
+                    Text("正在翻译...")
+                        .font(.system(size: 13))
+                        .foregroundColor(.secondary)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                ScrollView {
+                    HStack(alignment: .top, spacing: 0) {
+                        Text(text)
+                            .font(.system(size: 14))
+                            .lineSpacing(4)
+                            .textSelection(.enabled)
+                        Rectangle()
+                            .fill(Color.primary)
+                            .frame(width: 1.5, height: 16)
+                            .opacity(0.7)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
             }
 
             HStack {
