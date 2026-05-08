@@ -62,8 +62,10 @@ final class AppState: ObservableObject {
     private var currentBubbleAnchor: NSPoint = .zero
 
     init() {
+        ProcessInfo.processInfo.disableSuddenTermination()
         setupKeyboardShortcut()
         setupAppTermination()
+        setupWakeHandler()
         setupClipboardDetector()
         showWelcomeIfNeeded()
 
@@ -200,6 +202,7 @@ final class AppState: ObservableObject {
 
         let window = makeFloatingWindow(contentView: hostingView, at: bubblePosition, size: hostingView.frame.size, resizable: true)
         window.setContentSize(NSSize(width: 520, height: 320))
+        window.isMovableByWindowBackground = true
         window.initialFirstResponder = nil
         bubbleWindow = window
         window.orderFront(nil)
@@ -365,6 +368,27 @@ final class AppState: ObservableObject {
                 self.dismissAllWindows()
                 if let monitor = self.globalEventMonitor {
                     NSEvent.removeMonitor(monitor)
+                }
+            }
+        }
+    }
+
+    private func setupWakeHandler() {
+        NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.didWakeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self = self else { return }
+            MainActor.assumeIsolated {
+                guard self.isMonitoringEnabled else { return }
+                self.textMonitor.stopMonitoring()
+                self.clipboardDetector.stop()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                    if self.isMonitoringEnabled {
+                        self.textMonitor.startMonitoring()
+                        self.clipboardDetector.start()
+                    }
                 }
             }
         }
